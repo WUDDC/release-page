@@ -13,6 +13,13 @@
 - 拉取结果缓存 10 分钟（localStorage），避免触发 GitHub 匿名接口限流（每小时 60 次/IP）；
 - `repo` 留空或拉取失败时，自动展示文件内 `latest` / `changelog` 的内置数据兜底。
 
+## 平台图标
+
+平台图标不在页面内打包绘制，由访客浏览器直接加载各平台官方站点的图标（`PLATFORMS` 里的 `iconUrl`）：
+
+- fnOS：fnnas.com · 群晖：fileres.synology.com · Windows：microsoft.com · Unraid：GitHub 官方组织头像 · Linux：linux.org
+- 加载失败时降级到仓库内 `assets/icons/` 的本地副本（仅为降级用途的小图），再失败显示平台名首字母。
+
 示例（fnOS 版本来自第三方仓库）：
 
 ```js

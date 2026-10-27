@@ -138,6 +138,10 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
 .p-icon .icon{width:24px;height:24px}
 .p-icon.big{width:60px;height:60px;border-radius:16px}
 .p-icon.big .icon{width:30px;height:30px}
+.p-logo{width:26px;height:26px;object-fit:contain;display:block;border-radius:6px}
+.p-icon.big .p-logo{width:36px;height:36px;border-radius:8px}
+.p-icon-fb{font-weight:600;color:var(--brand);font-size:17px;line-height:1}
+.p-icon.big .p-icon-fb{font-size:24px}
 .platform-card h3{margin:0;font-size:16px;line-height:1.4}
 .p-sub{color:var(--text-2);font-size:13px;margin-top:1px}
 .p-meta{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--text-2)}
@@ -388,7 +392,8 @@ const PLATFORMS = [
     name: "fnOS 版本",
     sub: "飞牛私有云 NAS",
     desc: "适用于飞牛私有云 fnOS 4.0 及以上版本 · x86_64 架构",
-    icon: "drive",
+    iconUrl: "https://www.fnnas.com/favicon.ico",
+    iconLocal: "assets/icons/fnos.png",
     repo: "luodaoyi/TAD6S4N10G-fnos",
     prefer: "\\.fpk$",
     exclude: "^tank-",
@@ -416,7 +421,8 @@ const PLATFORMS = [
     name: "群晖版本",
     sub: "Synology DSM 7.x",
     desc: "适用于 DSM 7.0 – 7.2 · 提供 x86_64 与 ARM64 套件",
-    icon: "server",
+    iconUrl: "https://fileres.synology.com/images/common/favicon/syno/icon-96x96.png",
+    iconLocal: "assets/icons/synology.png",
     repo: null,
     tip: "推荐在「套件中心」搜索安装；手动安装请进入套件中心 → 手动安装，上传 <code>.spk</code> 文件。",
     latest: {
@@ -459,7 +465,8 @@ const PLATFORMS = [
     name: "Windows 版本",
     sub: "Windows 10 / 11",
     desc: "适用于 Windows 10（1909）及以上 · 提供 x64 与 ARM64 安装包",
-    icon: "windows",
+    iconUrl: "https://www.microsoft.com/favicon.ico",
+    iconLocal: "assets/icons/windows.png",
     repo: null,
     tip: "双击运行安装程序，按向导完成安装；便携版解压后直接运行 <code>TAD6S4N.exe</code> 即可。",
     latest: {
@@ -506,7 +513,8 @@ const PLATFORMS = [
     name: "Unraid 版本",
     sub: "Unraid 6.10+",
     desc: "适用于 Unraid 6.10 及以上版本 · 以插件方式安装",
-    icon: "rack",
+    iconUrl: "https://github.com/unraid.png",
+    iconLocal: "assets/icons/unraid.png",
     repo: null,
     tip: "在 Unraid「Apps / 插件」中搜索安装，或下载 <code>.plg</code> 后通过「Install Plugin」安装。",
     latest: {
@@ -543,7 +551,8 @@ const PLATFORMS = [
     name: "Linux 版本",
     sub: "deb / rpm / AppImage",
     desc: "提供 deb、rpm 与 AppImage 三种格式 · 支持 x86_64 与 ARM64",
-    icon: "terminal",
+    iconUrl: "https://www.linux.org/favicon.ico",
+    iconLocal: "assets/icons/linux.png",
     repo: null,
     tip: "deb 系：<code>sudo apt install ./tad6s4n_amd64.deb</code>；rpm 系：<code>sudo dnf install ./tad6s4n.x86_64.rpm</code>；AppImage：<code>chmod +x</code> 后直接运行。",
     latest: {
@@ -593,11 +602,6 @@ const PLATFORMS = [
 
 /* 内联图标（描边风格，跟随文字颜色） */
 const ICONS = {
-  drive: '<line x1="22" y1="12" x2="2" y2="12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" y1="16" x2="6.01" y2="16"/><line x1="10" y1="16" x2="10.01" y2="16"/>',
-  server: '<rect x="2" y="3" width="20" height="8" rx="2"/><rect x="2" y="13" width="20" height="8" rx="2"/><line x1="6" y1="7" x2="6.01" y2="7"/><line x1="6" y1="17" x2="6.01" y2="17"/>',
-  windows: '<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>',
-  rack: '<rect x="3" y="3" width="18" height="5" rx="1"/><rect x="3" y="10" width="18" height="5" rx="1"/><rect x="3" y="17" width="18" height="4" rx="1"/><line x1="7" y1="5.5" x2="7.01" y2="5.5"/><line x1="7" y1="12.5" x2="7.01" y2="12.5"/><line x1="7" y1="19" x2="7.01" y2="19"/>',
-  terminal: '<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>',
   download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/>',
   history: '<path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"/><path d="M3 3v5h5"/><polyline points="12 7 12 12 15 15"/>',
   back: '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
@@ -784,6 +788,22 @@ async function syncReleases(p){
   repaint(true);
 }
 
+/* 平台图标：优先热链官方站点图标，失败降级 assets/icons/ 本地副本，再失败用首字母占位 */
+function logoImg(p){
+  return '<img class="p-logo" src="' + p.iconUrl + '" alt="" loading="lazy" data-local="' + p.iconLocal + '" data-letter="' + p.id.charAt(0).toUpperCase() + '" onerror="platIconFallback(this)">';
+}
+function platIconFallback(img){
+  if(img.getAttribute("data-step") !== "local"){
+    img.setAttribute("data-step", "local");
+    img.src = img.getAttribute("data-local");
+  }else{
+    const fb = document.createElement("span");
+    fb.className = "p-icon-fb";
+    fb.textContent = img.getAttribute("data-letter") || "?";
+    img.replaceWith(fb);
+  }
+}
+
 /* 首页：平台卡片 */
 function renderHome(){
   document.getElementById("platform-grid").innerHTML = PLATFORMS.map(function(p){
@@ -791,7 +811,7 @@ function renderHome(){
     const a = st.latest.assets[0];
     return '<a class="platform-card" href="#/platform/' + p.id + '" aria-label="进入' + esc(p.name) + '下载页，最新版本 v' + esc(st.latest.version) + '">' +
         '<span class="p-arrow">' + icon("arrow") + "</span>" +
-        '<span class="p-icon">' + icon(p.icon) + "</span>" +
+        '<span class="p-icon">' + logoImg(p) + "</span>" +
         '<span class="p-text"><h3>' + esc(p.name) + "</h3><span class='p-sub'>" + esc(p.sub) + "</span></span>" +
         '<span class="p-meta"><span class="ver-chip">' + icon("download") + "v" + esc(st.latest.version) + "</span><span>" + (a ? esc(a.size) : "") + "</span></span>" +
       "</a>";
@@ -864,7 +884,7 @@ function paintPlatform(p){
     '<div class="container">' +
       '<a class="back" href="#/">' + icon("back") + "返回选择平台</a>" +
       '<div class="plat-head">' +
-        '<span class="p-icon big">' + icon(p.icon) + "</span>" +
+        '<span class="p-icon big">' + logoImg(p) + "</span>" +
         "<div><h1 class='plat-title' tabindex='-1'>" + esc(p.name) + "</h1>" +
         '<p class="plat-desc">' + esc(p.desc) + "</p></div>" +
       "</div>" +
