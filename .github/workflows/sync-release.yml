@@ -51,4 +51,6 @@ jobs:
             exit 0
           fi
           git commit -m "chore: sync latest release artifacts"
-          git push "https://x-access-token:${SYNC_PAT}@github.com/WUDDC/release-page.git" main
+          # checkout 会用 GITHUB_TOKEN 设置 extraheader 且优先级高于 URL 里的凭据，先移除再用 PAT 推送
+          git config --unset-all http.https://github.com/.extraheader
+          git push "https://${SYNC_PAT}@github.com/WUDDC/release-page.git" main
