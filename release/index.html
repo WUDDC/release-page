@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="TAD6S4N模块全平台发布页：支持 fnOS、群晖、Windows、Unraid 与 Linux，下载最新版本并查看更新日志。">
+<meta name="description" content="TAD6S4N模块发布页：fnOS 版已发布，群晖、Windows、Unraid 与 Linux 版即将上线，下载最新版本并查看更新日志。">
 <link rel="icon" type="image/png" href="assets/logo.png">
 <title>TAD6S4N模块 · 软件发布页</title>
 <style>
@@ -152,6 +152,11 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
   font-weight:500;font-size:12.5px;font-variant-numeric:tabular-nums;
 }
 .ver-chip .icon{width:12.5px;height:12.5px;color:var(--brand)}
+/* 未上线平台：卡片置灰 + 虚线「即将上线」徽标 */
+.ver-chip.soon{background:transparent;border:1px dashed var(--border-strong);color:var(--text-2);font-weight:600}
+.platform-card.coming-soon .p-logo,.platform-card.coming-soon .p-icon img{filter:grayscale(1);opacity:.72}
+.soon-badge{display:inline-block;padding:5px 16px;border-radius:999px;border:1px dashed var(--border-strong);color:var(--text-2);font-weight:600;font-size:14px}
+.soon-text{margin:14px 0 0;color:var(--text-2);font-size:14.5px;line-height:1.7}
 .p-arrow{
   position:absolute;top:18px;right:16px;color:var(--brand);
   opacity:0;transform:translateX(-4px);transition:.18s ease;
@@ -355,7 +360,7 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
   <section id="view-home" class="view" aria-label="选择平台">
     <div class="container">
       <div class="hero">
-        <span class="eyebrow"><i data-icon="zap" aria-hidden="true"></i><span id="eyebrow-text">免费使用 · 飞牛 fnOS / 群晖 / Unraid / Windows / Linux</span></span>
+        <span class="eyebrow"><i data-icon="zap" aria-hidden="true"></i><span id="eyebrow-text">免费使用 · fnOS 已上线 · 群晖 / Windows / Unraid / Linux 即将上线</span></span>
         <h1 id="hero-title">针对 TAD6S4N 主机硬件<br>深度适配的硬件管理模块</h1>
         <p class="lead" id="hero-lead">监控面板、风扇控制、按键映射、功耗设置、开关计划、电源监控、固件升级、压力测试——一个页面全管完，手机 APP 同样适配。</p>
         <p class="hero-meta" id="hero-meta"></p>
@@ -363,7 +368,7 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
       <div class="pick">
         <div class="section-head">
           <h2>选择你的平台</h2>
-          <span class="sub">点击进入对应系统的下载页</span>
+          <span class="sub">fnOS 可直接下载 · 其余平台适配中，敬请期待</span>
         </div>
         <div class="platform-grid" id="platform-grid"><!-- JS 渲染 --></div>
         <p class="install-note">升级提示：直接安装新包即可覆盖升级，配置与历史数据自动保留；下载后建议核对 SHA256 校验值。</p>
@@ -479,41 +484,10 @@ const PLATFORMS = [
     iconUrl: "https://fileres.synology.com/images/common/favicon/syno/icon-96x96.png",
     iconLocal: "assets/icons/synology.png",
     repo: null,
+    comingSoon: true,
     tip: "推荐在「套件中心」搜索安装；手动安装请进入套件中心 → 手动安装，上传 <code>.spk</code> 文件。",
-    latest: {
-      version: "2.4.0",
-      date: "2026-10-18",
-      assets: [
-        { label: "DSM 7 套件", file: "tad6s4n_dsm7_2.4.0_x86_64.spk", arch: "x86_64", size: "104.6 MB", url: "#" },
-        { label: "DSM 7 套件", file: "tad6s4n_dsm7_2.4.0_arm64.spk", arch: "ARM64", size: "89.2 MB", url: "#" }
-      ]
-    },
-    changelog: [
-      {
-        version: "2.4.0", date: "2026-10-18",
-        new: ["支持套件中心在线检测更新"],
-        imp: ["适配 DSM 7.2 权限模型，安装更顺畅", "缩略图生成速度提升"],
-        fix: ["修复部分 ARM 机型上浏览大目录时崩溃的问题"]
-      },
-      {
-        version: "2.3.2", date: "2026-09-20",
-        fix: ["修复 DSM 7.2 权限变更后无法写入共享文件夹的问题", "修复任务暂停后 CPU 占用偏高的问题"]
-      },
-      {
-        version: "2.3.0", date: "2026-08-30",
-        new: ["支持多任务并行传输", "新增按共享文件夹粒度的备份计划"],
-        imp: ["索引速度提升约 35%"]
-      },
-      {
-        version: "2.2.0", date: "2026-07-15",
-        new: ["全面支持 DSM 7.0 / 7.1 / 7.2"],
-        fix: ["修复更换端口后无法连接的问题"]
-      },
-      {
-        version: "2.1.0", date: "2026-06-10",
-        new: ["群晖平台首个正式版本"]
-      }
-    ]
+    latest: null,
+    changelog: []
   },
   {
     id: "windows",
@@ -523,45 +497,10 @@ const PLATFORMS = [
     iconUrl: "https://www.microsoft.com/favicon.ico",
     iconLocal: "assets/icons/windows.png",
     repo: null,
+    comingSoon: true,
     tip: "双击运行安装程序，按向导完成安装；便携版解压后直接运行 <code>TAD6S4N.exe</code> 即可。",
-    latest: {
-      version: "2.4.1",
-      date: "2026-10-23",
-      assets: [
-        { label: "安装版 x64", file: "tad6s4n_setup_2.4.1_x64.exe", arch: "x64", size: "118.4 MB", url: "#" },
-        { label: "便携版 x64", file: "tad6s4n_portable_2.4.1_x64.zip", arch: "x64", size: "156.8 MB", url: "#" },
-        { label: "安装版 ARM64", file: "tad6s4n_setup_2.4.1_arm64.exe", arch: "ARM64", size: "106.1 MB", url: "#" }
-      ]
-    },
-    changelog: [
-      {
-        version: "2.4.1", date: "2026-10-23",
-        fix: ["修复部分设备启动时白屏的问题", "修复系统托盘图标在高分屏下模糊的问题"]
-      },
-      {
-        version: "2.4.0", date: "2026-10-15",
-        new: ["新增虚拟磁盘映射，可在资源管理器中直接浏览云端文件", "新增开机自启动与静默启动选项"],
-        imp: ["全局文件搜索速度提升", "降低后台内存占用"],
-        fix: ["修复 Windows 10 1909 下安装界面卡住的问题"]
-      },
-      {
-        version: "2.3.2", date: "2026-09-18",
-        fix: ["修复与部分安全软件冲突导致的更新失败", "修复 NTFS 稀疏文件同步异常"]
-      },
-      {
-        version: "2.3.0", date: "2026-08-28",
-        new: ["新增深色模式界面"],
-        imp: ["安装器支持静默安装参数（/S）"]
-      },
-      {
-        version: "2.2.0", date: "2026-07-08",
-        fix: ["修复代理自动检测在某些网络环境下失败的问题"]
-      },
-      {
-        version: "2.1.0", date: "2026-05-30",
-        new: ["Windows 平台首个正式版本，支持文件同步与备份"]
-      }
-    ]
+    latest: null,
+    changelog: []
   },
   {
     id: "unraid",
@@ -571,35 +510,10 @@ const PLATFORMS = [
     iconUrl: "https://github.com/unraid.png",
     iconLocal: "assets/icons/unraid.png",
     repo: null,
+    comingSoon: true,
     tip: "在 Unraid「Apps / 插件」中搜索安装，或下载 <code>.plg</code> 后通过「Install Plugin」安装。",
-    latest: {
-      version: "2.3.2",
-      date: "2026-09-26",
-      assets: [
-        { label: "Unraid 插件", file: "tad6s4n_unraid_2.3.2.plg", arch: "通用", size: "2.4 MB", url: "#" }
-      ]
-    },
-    changelog: [
-      {
-        version: "2.3.2", date: "2026-09-26",
-        imp: ["降低校验（Parity Check）期间的磁盘 IO 优先级"],
-        fix: ["修复停止阵列时后台进程未正常退出的问题"]
-      },
-      {
-        version: "2.3.0", date: "2026-08-30",
-        new: ["支持 Community Applications 一键安装", "新增 Unassigned Devices 设备同步支持"],
-        fix: ["修复开机插件自启动偶发失败的问题"]
-      },
-      {
-        version: "2.2.0", date: "2026-07-08",
-        imp: ["插件设置界面适配 Unraid 深色主题"],
-        fix: ["修复大文件校验偶发超时的问题"]
-      },
-      {
-        version: "2.1.0", date: "2026-06-01",
-        new: ["Unraid 平台首个正式版本，提供 .plg 插件安装方式"]
-      }
-    ]
+    latest: null,
+    changelog: []
   },
   {
     id: "linux",
@@ -609,47 +523,10 @@ const PLATFORMS = [
     iconUrl: "https://www.kernel.org/theme/images/logos/favicon.png",
     iconLocal: "assets/icons/linux.png",
     repo: null,
+    comingSoon: true,
     tip: "deb 系：<code>sudo apt install ./tad6s4n_amd64.deb</code>；rpm 系：<code>sudo dnf install ./tad6s4n.x86_64.rpm</code>；AppImage：<code>chmod +x</code> 后直接运行。",
-    latest: {
-      version: "2.4.1",
-      date: "2026-10-23",
-      assets: [
-        { label: "deb 包", file: "tad6s4n_2.4.1_amd64.deb", arch: "x86_64", size: "102.7 MB", url: "#" },
-        { label: "rpm 包", file: "tad6s4n_2.4.1_x86_64.rpm", arch: "x86_64", size: "104.9 MB", url: "#" },
-        { label: "AppImage", file: "TAD6S4N_2.4.1_x86_64.AppImage", arch: "x86_64", size: "158.3 MB", url: "#" },
-        { label: "deb 包", file: "tad6s4n_2.4.1_arm64.deb", arch: "ARM64", size: "96.5 MB", url: "#" }
-      ]
-    },
-    changelog: [
-      {
-        version: "2.4.1", date: "2026-10-23",
-        fix: ["修复 AppImage 在 Ubuntu 24.04 下无法启动的问题", "修复 GNOME 下系统托盘图标不显示的问题"]
-      },
-      {
-        version: "2.4.0", date: "2026-10-15",
-        new: ["新增官方 apt / dnf 软件源，支持系统自动更新"],
-        imp: ["完善 Wayland 下的窗口与托盘体验"],
-        fix: ["修复 arm64 设备上选择同步目录时崩溃的问题"]
-      },
-      {
-        version: "2.3.2", date: "2026-09-18",
-        imp: ["降低常驻进程内存占用"],
-        fix: ["修复 inotify 监听数量超限导致的漏同步"]
-      },
-      {
-        version: "2.3.0", date: "2026-08-28",
-        new: ["新增命令行管理工具 tad6s4n-cli"],
-        imp: ["systemd 服务单元更规范，支持开机自启"]
-      },
-      {
-        version: "2.2.0", date: "2026-07-08",
-        new: ["提供 AppImage 免安装格式"]
-      },
-      {
-        version: "2.1.0", date: "2026-05-30",
-        new: ["Linux 平台首个正式版本，提供 deb / rpm 安装包"]
-      }
-    ]
+    latest: null,
+    changelog: []
   }
 ];
 
@@ -902,26 +779,35 @@ function platIconFallback(img){
   }
 }
 
-/* 首页：平台卡片 */
+/* 首页：平台卡片（comingSoon 平台置灰，标「即将上线」，不显示版本/大小） */
 function renderHome(){
   document.getElementById("platform-grid").innerHTML = PLATFORMS.map(function(p){
     const st = stOf(p);
+    const head = '<span class="p-arrow">' + icon("arrow") + "</span>" +
+        '<span class="p-icon">' + logoImg(p) + "</span>" +
+        '<span class="p-text"><h3>' + esc(p.name) + "</h3><span class='p-sub'>" + esc(p.sub) + "</span></span>";
+    if(p.comingSoon){
+      return '<a class="platform-card coming-soon" href="#/platform/' + p.id + '" aria-label="进入' + esc(p.name) + '页面（即将上线）">' +
+          head + '<span class="p-meta"><span class="ver-chip soon">即将上线</span></span>' +
+        "</a>";
+    }
     const a = st.latest.assets[0];
     return '<a class="platform-card" href="#/platform/' + p.id + '" aria-label="进入' + esc(p.name) + '下载页，最新版本 v' + esc(st.latest.version) + '">' +
-        '<span class="p-arrow">' + icon("arrow") + "</span>" +
-        '<span class="p-icon">' + logoImg(p) + "</span>" +
-        '<span class="p-text"><h3>' + esc(p.name) + "</h3><span class='p-sub'>" + esc(p.sub) + "</span></span>" +
-        '<span class="p-meta"><span class="ver-chip">' + icon("download") + "v" + esc(st.latest.version) + "</span><span>" + (a ? esc(a.size) : "") + "</span></span>" +
+        head + '<span class="p-meta"><span class="ver-chip">' + icon("download") + "v" + esc(st.latest.version) + "</span><span>" + (a ? esc(a.size) : "") + "</span></span>" +
       "</a>";
   }).join("");
 
-  /* 顶部"最新发布"摘要：取全平台日期最新的一条 */
-  let newest = PLATFORMS[0];
-  PLATFORMS.forEach(function(p){
+  /* 顶部"最新发布"摘要：只统计已上线平台 */
+  const launched = PLATFORMS.filter(function(p){ return !p.comingSoon; });
+  let newest = launched[0];
+  launched.forEach(function(p){
     if(new Date(stOf(p).latest.date) > new Date(stOf(newest).latest.date)) newest = p;
   });
   document.getElementById("hero-meta").innerHTML =
-    "最新发布 <b>v" + esc(stOf(newest).latest.version) + "</b> · " + esc(stOf(newest).latest.date) + " · 覆盖 " + PLATFORMS.length + " 个平台";
+    "最新发布 <b>v" + esc(stOf(newest).latest.version) + "</b> · " + esc(stOf(newest).latest.date) +
+    (launched.length < PLATFORMS.length
+      ? " · 其他 " + (PLATFORMS.length - launched.length) + " 个平台即将上线"
+      : " · 覆盖 " + PLATFORMS.length + " 个平台");
 }
 
 /* 更新日志条目：GitHub 数据带 body（Markdown 正文），内置数据按分组渲染 */
@@ -959,6 +845,22 @@ function dlAttrs(url){
 /* 平台下载页（paintPlatform 只负责渲染，视图切换见 showPlatform） */
 function paintPlatform(p){
   const st = stOf(p);
+  if(p.comingSoon){
+    document.getElementById("view-platform").innerHTML =
+      '<div class="container">' +
+        '<a class="back" href="#/">' + icon("back") + "返回选择平台</a>" +
+        '<div class="plat-head">' +
+          '<span class="p-icon big">' + logoImg(p) + "</span>" +
+          "<div><h1 class='plat-title' tabindex='-1'>" + esc(p.name) + "</h1>" +
+          '<p class="plat-desc">' + esc(p.desc) + "</p></div>" +
+        "</div>" +
+        '<div class="download-card">' +
+          '<span class="soon-badge">即将上线</span>' +
+          '<p class="soon-text">「' + esc(p.name) + "」正在适配中，尚未发布。发布后将在本页提供安装包下载与更新日志。</p>" +
+        "</div>" +
+      "</div>";
+    return;
+  }
   const l = st.latest;
   const main = l.assets[0];
   const rest = l.assets.slice(1);
@@ -1027,7 +929,7 @@ function showPlatform(p){
   paintPlatform(p);
   document.getElementById("view-home").hidden = true;
   document.getElementById("view-platform").hidden = false;
-  document.title = p.name + "下载 · " + SITE.productName;
+  document.title = p.name + (p.comingSoon ? "（即将上线） · " : "下载 · ") + SITE.productName;
   window.scrollTo({ top: 0, behavior: "auto" });
   if(p.repo) syncReleases(p);
 }
