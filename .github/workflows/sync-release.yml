@@ -30,18 +30,20 @@ jobs:
             mname=${mname:-manifest.json}
             read -r tag pub <<< "$(gh api "repos/$repo/releases/latest" --jq '.tag_name + " " + .published_at')"
             echo ">> $repo 最新版本 $tag -> $dir/ ($mname)"
-            mkdir -p "$dir"
-            gh release download "$tag" --repo "$repo" --dir "$dir" --clobber \
+            # 下载到临时目录再改名拷入，避免误改 app/ 里已有的历史版本文件
+            tmp=$(mktemp -d)
+            gh release download "$tag" --repo "$repo" --dir "$tmp" --clobber \
               --pattern '*.fpk' --pattern '*.spk'
-            # 重命名：tad-module.fpk -> tad-module-v1.0.1.fpk，并收集文件名/大小
+            mkdir -p "$dir"
             names=(); sizes="{"
-            for f in "$dir"/*.fpk "$dir"/*.spk; do
+            for f in "$tmp"/*.fpk "$tmp"/*.spk; do
               [ -e "$f" ] || continue
-              mv "$f" "${f%.*}-$tag.${f##*.}"
-              f="${f%.*}-$tag.${f##*.}"
-              b=$(basename "$f"); names+=("$b"); sizes+="\"$b\":$(stat -c%s "$f"),"
+              b="$(basename "${f%.*}")-$tag.${f##*.}"
+              mv "$f" "$dir/$b"
+              names+=("$b"); sizes+="\"$b\":$(stat -c%s "$dir/$b"),"
             done
-            sizes="${sizes%,}}"
+            rm -rf "$tmp"
+            sizes="${sizes%,}"
             # 版本清单：发布页读它来生成本地下载链接，无需访问 GitHub API
             jq -n --arg repo "$repo" --arg tag "$tag" --arg pub "$pub" --argjson sizes "$sizes" \
               '{repo:$repo, tag:$tag, published:$pub, generated:(now|todate), files:$ARGS.positional, sizes:$sizes}' \
