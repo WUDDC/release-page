@@ -427,6 +427,10 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
  *   repo: "luodaoyi/TAD6S4N10G-fnos"
  *   prefer:  可选，主下载附件的匹配正则（命中的排第一位）
  *   exclude: 可选，需要从下载列表排除的附件正则
+ *   localManifest: 可选，本站镜像清单（ci: sync-release 每次生成 app/<平台>.json），
+ *     存在时下载链接优先指向本站 app/ 目录里带版本号的安装包（走本站 CDN），
+ *     清单拉取失败才回退到 GitHub Releases 原始地址
+ *   primaryLabel: 可选，主下载按钮的显示名（配合 localManifest 使用）
  * repo 留空（null）或拉取失败时，使用下方 latest / changelog 内置数据
  * 兜底展示。拉取结果缓存 10 分钟，避免触发 GitHub 接口限流（每小时 60 次）。
  * ===================================================================== */
@@ -446,12 +450,14 @@ const PLATFORMS = [
     repo: "luodaoyi/TAD6S4N10G-fnos",
     prefer: "\\.fpk$",
     exclude: "^tank-",
+    localManifest: "../app/fnos.json",
+    primaryLabel: "fnOS 安装包",
     tip: "打开 fnOS「应用中心 → 手动安装」，选择下载的 <code>.fpk</code> 安装包完成安装。",
     latest: {
       version: "1.0.1",
       date: "2026-10-24",
       assets: [
-        { label: "fnOS 安装包", file: "tad-module.fpk", arch: "x86_64", size: "5.7 MB", url: "https://github.com/luodaoyi/TAD6S4N10G-fnos/releases/download/v1.0.1/tad-module.fpk" }
+        { label: "fnOS 安装包", file: "tad-module-v1.0.1.fpk", arch: "x86_64", size: "5.7 MB", url: "../app/tad-module-v1.0.1.fpk" }
       ]
     },
     changelog: [
@@ -803,7 +809,49 @@ function repaint(preserveScroll){
     }
   }
 }
+/* 本地版本清单：sync-release workflow 同步安装包到 app/ 时一并生成（fnos.json）。
+ * 优先读它把下载链接指向本站 app/ 目录（同源、国内直连快），失败才回退 GitHub API */
+async function fetchLocalManifest(p){
+  if(!p.localManifest) throw new Error("no local manifest");
+  const key = "appman:" + p.id;
+  const hit = cacheGet(key, true);
+  if(hit && hit.fresh) return hit.data;
+  try{
+    const res = await fetch(p.localManifest, { signal: AbortSignal.timeout(6000) });
+    if(!res.ok) throw new Error("manifest HTTP " + res.status);
+    const data = await res.json();
+    cacheSet(key, data);
+    return data;
+  }catch(e){
+    if(hit) return hit.data;
+    throw e;
+  }
+}
 async function syncLatest(p){
+  try{
+    const man = await fetchLocalManifest(p);
+    if(man && Array.isArray(man.files) && man.files.length){
+      const dir = p.localManifest.replace(/[^/]*$/, "");
+      const preferRe = p.prefer ? new RegExp(p.prefer, "i") : null;
+      const st = stOf(p);
+      st.latest = {
+        version: tagVer(man.tag),
+        date: fmtDate(man.published),
+        assets: man.files.map(function(f){
+          return {
+            label: (preferRe && preferRe.test(f) && p.primaryLabel) ? p.primaryLabel : f,
+            file: f, arch: "",
+            size: humanSize((man.sizes && man.sizes[f]) || 0),
+            url: dir + encodeURIComponent(f)
+          };
+        })
+      };
+      st.latestSrc = "local";
+      st.error = false;
+      repaint(false);
+      return;
+    }
+  }catch(e){ /* 本地清单缺失或拉取失败 → 回退 GitHub API */ }
   try{
     const rel = await ghApi("/repos/" + p.repo + "/releases/latest", "latest:" + p.repo);
     if(rel && rel.tag_name){
@@ -826,7 +874,8 @@ async function syncReleases(p){
     const list = await ghApi("/repos/" + p.repo + "/releases?per_page=20", "releases:" + p.repo);
     if(Array.isArray(list) && list.length){
       st.changelog = list.map(normRelease);
-      if(list[0].tag_name) st.latest = normLatest(list[0], p);
+      /* 本地清单已接管下载链接时不覆盖 latest，避免退回 GitHub 原始地址 */
+      if(list[0].tag_name && st.latestSrc !== "local") st.latest = normLatest(list[0], p);
       st.changelogSrc = "github";
       st.error = false;
     }
@@ -901,9 +950,10 @@ function releaseHTML(r, i){
     "</div>";
 }
 
-/* 下载链接：占位地址（#）时拦截跳转 */
+/* 下载链接：占位地址（#）时拦截跳转；本站相对路径加 download 属性直接保存 */
 function dlAttrs(url){
-  return 'href="' + url + '"' + (url === "#" ? ' data-stub' : "");
+  const local = url !== "#" && !/^https?:\/\//i.test(url);
+  return 'href="' + url + '"' + (local ? " download" : "") + (url === "#" ? ' data-stub' : "");
 }
 
 /* 平台下载页（paintPlatform 只负责渲染，视图切换见 showPlatform） */
@@ -918,7 +968,8 @@ function paintPlatform(p){
   if(p.repo){
     const repoLink = '<a href="https://github.com/' + esc(p.repo) + '" target="_blank" rel="noopener noreferrer">' + esc(p.repo) + "</a>";
     if(st.changelogSrc === "github"){
-      srcNote = '<div class="src-note">' + icon("link") + "数据来源：" + repoLink + " · 已同步 GitHub Releases</div>";
+      srcNote = '<div class="src-note">' + icon("link") + "数据来源：" + repoLink + " · 已同步 GitHub Releases" +
+        (st.latestSrc === "local" ? " · 安装包由本站镜像加速" : "") + "</div>";
     }else if(st.loading){
       srcNote = '<div class="src-note">' + icon("link") + "数据来源：" + repoLink + " · 正在获取更新日志…</div>";
     }else if(st.error){
