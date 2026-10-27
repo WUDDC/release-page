@@ -36,14 +36,11 @@ jobs:
             gh release download "$tag" --repo "$repo" --dir "$tmp" --clobber \
               --pattern '*.fpk' --pattern '*.spk'
             mkdir -p "$dir"
-            names=""
             for f in "$tmp"/*.fpk "$tmp"/*.spk; do
               [ -e "$f" ] || continue
               b="$(basename "${f%.*}")-$tag.${f##*.}"
               mv "$f" "$dir/$b"
               printf '%s\t%s\n' "$b" "$(stat -c%s "$dir/$b")" >> "$tmp/files.tsv"
-              names+="$b
-"
             done
             # 版本清单：发布页读它来生成本地下载链接，无需访问 GitHub API
             jq -R -s --arg repo "$repo" --arg tag "$tag" --arg pub "$pub" '
