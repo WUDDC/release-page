@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="云枢全平台发布页：支持 fnOS、群晖、Windows、Unraid 与 Linux，下载最新版本并查看更新日志。">
-<title>云枢 · 软件发布页</title>
+<meta name="description" content="TAD6S4N模块全平台发布页：支持 fnOS、群晖、Windows、Unraid 与 Linux，下载最新版本并查看更新日志。">
+<title>TAD6S4N模块 · 软件发布页</title>
 <style>
 /* ========== 主题变量（浅色 / 深色自适应） ========== */
 :root{
@@ -321,7 +321,7 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
   <div class="container header-inner">
     <a class="brand" href="#/">
       <span class="brand-mark" id="brand-mark"></span>
-      <span id="brand-name">云枢</span>
+      <span id="brand-name">TAD6S4N模块</span>
     </a>
     <nav class="header-nav" aria-label="站点导航">
       <!-- 占位链接：部署时替换为真实地址 -->
@@ -338,8 +338,8 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
     <div class="container">
       <div class="hero">
         <span class="eyebrow"><i data-icon="zap" aria-hidden="true"></i><span id="eyebrow-text">全平台发布 · 持续更新</span></span>
-        <h1 id="hero-title">全平台数据同步与备份</h1>
-        <p class="lead" id="hero-lead">支持 fnOS、群晖、Windows、Unraid 与 Linux。选择你的系统，立即下载体验最新版本。</p>
+        <h1 id="hero-title">TAD6S4N模块</h1>
+        <p class="lead" id="hero-lead">支持 fnOS、群晖、Windows、Unraid 与 Linux，选择你的系统，立即下载体验最新版本。</p>
         <p class="hero-meta" id="hero-meta"></p>
       </div>
       <div class="pick">
@@ -358,7 +358,7 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
 
 <footer class="site-footer">
   <div class="container footer-inner">
-    <span>© 2026 云枢 CloudHub · 保留所有权利</span>
+    <span>© 2026 TAD6S4N模块 · 保留所有权利</span>
     <nav class="footer-links" aria-label="页脚链接">
       <a href="#" data-stub>官网</a>
       <a href="#" data-stub>文档</a>
@@ -382,8 +382,8 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
  * 兜底展示。拉取结果缓存 10 分钟，避免触发 GitHub 接口限流（每小时 60 次）。
  * ===================================================================== */
 const SITE = {
-  productName: "云枢",
-  title: "云枢 · 软件发布页"
+  productName: "TAD6S4N模块",
+  title: "TAD6S4N模块 · 软件发布页"
 };
 
 const PLATFORMS = [
@@ -398,37 +398,20 @@ const PLATFORMS = [
     exclude: "^tank-",
     tip: "打开 fnOS「应用中心 → 手动安装」，选择下载的 <code>.fpk</code> 安装包完成安装。",
     latest: {
-      version: "2.4.0",
-      date: "2026-10-20",
+      version: "1.0.1",
+      date: "2026-10-24",
       assets: [
-        { label: "fnOS 安装包", file: "cloudhub_fnos_2.4.0_x86_64.fpk", arch: "x86_64", size: "96.3 MB", url: "#" }
+        { label: "fnOS 安装包", file: "tad-module.fpk", arch: "x86_64", size: "5.7 MB", url: "https://github.com/luodaoyi/TAD6S4N10G-fnos/releases/download/v1.0.1/tad-module.fpk" }
       ]
     },
     changelog: [
       {
-        version: "2.4.0", date: "2026-10-20",
-        new: ["支持定时增量备份计划，可按天 / 周自定义执行时间", "新增传输限速设置，避免占满家庭带宽"],
-        imp: ["大批量小文件同步速度提升约 40%", "安装包体积减小 18%"],
-        fix: ["修复 fnOS 4.1 下部分含特殊字符的文件名同步失败的问题"]
+        version: "1.0.1", date: "2026-10-24",
+        fix: ["RTC 状态按 NAS 系统时区显示，与飞牛桌面时间保持一致"]
       },
       {
-        version: "2.3.2", date: "2026-09-26",
-        imp: ["新校验算法内存占用降低 30%"],
-        fix: ["修复深度休眠唤醒后备份任务不自动恢复的问题", "修复日志文件在个别场景下无限增长的问题"]
-      },
-      {
-        version: "2.3.0", date: "2026-09-05",
-        new: ["新增文件版本历史管理，默认保留 30 天、可自定义", "新增 WebDAV 只读挂载模式"],
-        imp: ["任务队列支持暂停 / 恢复"]
-      },
-      {
-        version: "2.2.0", date: "2026-08-12",
-        new: ["支持随 fnOS 开机自启动"],
-        fix: ["修复代理环境下无法登录的问题", "修复若干可能导致崩溃的边界情况"]
-      },
-      {
-        version: "2.1.0", date: "2026-07-01",
-        new: ["fnOS 平台首个正式版本，支持文件同步、备份与恢复核心功能"]
+        version: "1.0.0", date: "2026-10-24",
+        new: ["首个正式版：图形化备份与自动备份、三曲线风扇模式、硬盘面板、传感器显示、BIOS/网卡固件管理、压力测试与历史温度图表"]
       }
     ]
   },
@@ -444,8 +427,8 @@ const PLATFORMS = [
       version: "2.4.0",
       date: "2026-10-18",
       assets: [
-        { label: "DSM 7 套件", file: "cloudhub_dsm7_2.4.0_x86_64.spk", arch: "x86_64", size: "104.6 MB", url: "#" },
-        { label: "DSM 7 套件", file: "cloudhub_dsm7_2.4.0_arm64.spk", arch: "ARM64", size: "89.2 MB", url: "#" }
+        { label: "DSM 7 套件", file: "tad6s4n_dsm7_2.4.0_x86_64.spk", arch: "x86_64", size: "104.6 MB", url: "#" },
+        { label: "DSM 7 套件", file: "tad6s4n_dsm7_2.4.0_arm64.spk", arch: "ARM64", size: "89.2 MB", url: "#" }
       ]
     },
     changelog: [
@@ -482,14 +465,14 @@ const PLATFORMS = [
     desc: "适用于 Windows 10（1909）及以上 · 提供 x64 与 ARM64 安装包",
     icon: "windows",
     repo: null,
-    tip: "双击运行安装程序，按向导完成安装；便携版解压后直接运行 <code>CloudHub.exe</code> 即可。",
+    tip: "双击运行安装程序，按向导完成安装；便携版解压后直接运行 <code>TAD6S4N.exe</code> 即可。",
     latest: {
       version: "2.4.1",
       date: "2026-10-23",
       assets: [
-        { label: "安装版 x64", file: "cloudhub_setup_2.4.1_x64.exe", arch: "x64", size: "118.4 MB", url: "#" },
-        { label: "便携版 x64", file: "cloudhub_portable_2.4.1_x64.zip", arch: "x64", size: "156.8 MB", url: "#" },
-        { label: "安装版 ARM64", file: "cloudhub_setup_2.4.1_arm64.exe", arch: "ARM64", size: "106.1 MB", url: "#" }
+        { label: "安装版 x64", file: "tad6s4n_setup_2.4.1_x64.exe", arch: "x64", size: "118.4 MB", url: "#" },
+        { label: "便携版 x64", file: "tad6s4n_portable_2.4.1_x64.zip", arch: "x64", size: "156.8 MB", url: "#" },
+        { label: "安装版 ARM64", file: "tad6s4n_setup_2.4.1_arm64.exe", arch: "ARM64", size: "106.1 MB", url: "#" }
       ]
     },
     changelog: [
@@ -534,7 +517,7 @@ const PLATFORMS = [
       version: "2.3.2",
       date: "2026-09-26",
       assets: [
-        { label: "Unraid 插件", file: "cloudhub_unraid_2.3.2.plg", arch: "通用", size: "2.4 MB", url: "#" }
+        { label: "Unraid 插件", file: "tad6s4n_unraid_2.3.2.plg", arch: "通用", size: "2.4 MB", url: "#" }
       ]
     },
     changelog: [
@@ -566,15 +549,15 @@ const PLATFORMS = [
     desc: "提供 deb、rpm 与 AppImage 三种格式 · 支持 x86_64 与 ARM64",
     icon: "terminal",
     repo: null,
-    tip: "deb 系：<code>sudo apt install ./cloudhub_amd64.deb</code>；rpm 系：<code>sudo dnf install ./cloudhub.x86_64.rpm</code>；AppImage：<code>chmod +x</code> 后直接运行。",
+    tip: "deb 系：<code>sudo apt install ./tad6s4n_amd64.deb</code>；rpm 系：<code>sudo dnf install ./tad6s4n.x86_64.rpm</code>；AppImage：<code>chmod +x</code> 后直接运行。",
     latest: {
       version: "2.4.1",
       date: "2026-10-23",
       assets: [
-        { label: "deb 包", file: "cloudhub_2.4.1_amd64.deb", arch: "x86_64", size: "102.7 MB", url: "#" },
-        { label: "rpm 包", file: "cloudhub_2.4.1_x86_64.rpm", arch: "x86_64", size: "104.9 MB", url: "#" },
-        { label: "AppImage", file: "CloudHub_2.4.1_x86_64.AppImage", arch: "x86_64", size: "158.3 MB", url: "#" },
-        { label: "deb 包", file: "cloudhub_2.4.1_arm64.deb", arch: "ARM64", size: "96.5 MB", url: "#" }
+        { label: "deb 包", file: "tad6s4n_2.4.1_amd64.deb", arch: "x86_64", size: "102.7 MB", url: "#" },
+        { label: "rpm 包", file: "tad6s4n_2.4.1_x86_64.rpm", arch: "x86_64", size: "104.9 MB", url: "#" },
+        { label: "AppImage", file: "TAD6S4N_2.4.1_x86_64.AppImage", arch: "x86_64", size: "158.3 MB", url: "#" },
+        { label: "deb 包", file: "tad6s4n_2.4.1_arm64.deb", arch: "ARM64", size: "96.5 MB", url: "#" }
       ]
     },
     changelog: [
@@ -595,7 +578,7 @@ const PLATFORMS = [
       },
       {
         version: "2.3.0", date: "2026-08-28",
-        new: ["新增命令行管理工具 cloudhub-cli"],
+        new: ["新增命令行管理工具 tad6s4n-cli"],
         imp: ["systemd 服务单元更规范，支持开机自启"]
       },
       {
