@@ -2,6 +2,25 @@
 
 单文件静态页面，无需构建、无外部依赖，直接部署即可（Nginx / 对象存储 / GitHub Pages 等任意静态托管）。
 
+## 数据来源（GitHub Releases）
+
+每个平台可配置 `repo: "用户名/仓库名"`（可以是自己的仓库，也可以是其它人的公开仓库），页面会自动读取该仓库的 GitHub Releases：
+
+- **首页卡片 / 下载按钮**：来自 `releases/latest` —— 版本号（tag）、发布日期、附件列表；
+- **更新日志**：来自 `releases` 列表 —— 每个版本的 Markdown 正文原样渲染；
+- `prefer`：可选，主下载附件的匹配正则（命中的附件排第一位），如 fnOS 的 `"\\.fpk$"`；
+- `exclude`：可选，从下载列表排除的附件正则，如 `"^tank-"`；`.sha256` 等校验文件默认排除；
+- 拉取结果缓存 10 分钟（localStorage），避免触发 GitHub 匿名接口限流（每小时 60 次/IP）；
+- `repo` 留空或拉取失败时，自动展示文件内 `latest` / `changelog` 的内置数据兜底。
+
+示例（fnOS 版本来自第三方仓库）：
+
+```js
+repo: "luodaoyi/TAD6S4N10G-fnos",
+prefer: "\\.fpk$",
+exclude: "^tank-",
+```
+
 ## 自动部署
 
 已配置 GitHub Actions（`.github/workflows/deploy.yml`）：每次推送到 `main` 分支会自动构建并发布到 GitHub Pages，访问地址：

@@ -267,6 +267,21 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
   width:5px;height:5px;border-radius:50%;background:var(--border-strong);
 }
 
+/* ========== GitHub 数据来源与 Markdown 日志 ========== */
+.src-note{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--text-2)}
+.src-note .icon{width:14px;height:14px;flex:none}
+.src-note a{color:var(--brand)}
+.rel-link{font-size:12.5px;color:var(--brand);font-weight:400}
+.md{margin-top:4px}
+.md h3,.md h4,.md h5,.md h6{margin:18px 0 6px;font-size:15px;letter-spacing:0}
+.md h3{font-size:16px}
+.md p{margin:8px 0;font-size:14.5px}
+.md ul,.md ol{margin:8px 0;padding-left:22px}
+.md li{margin:4px 0;font-size:14.5px}
+.md a{color:var(--brand)}
+.md pre{background:var(--surface-2);border-radius:10px;padding:12px 14px;overflow:auto;margin:10px 0}
+.md pre code{background:none;padding:0}
+
 /* ========== 页脚 ========== */
 .site-footer{border-top:1px solid var(--border);padding:26px 0;background:var(--surface)}
 .footer-inner{
@@ -356,10 +371,15 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
 <script>
 /* =====================================================================
  * ★★★ 站点配置与发布数据（维护时只需修改本区域） ★★★
- * 1. 把 url:"#" 替换为真实安装包下载地址；
- * 2. 发新版本时：更新 latest 的 version/date/assets，并在 changelog
- *    数组最前面新增一条记录（new=新增 / imp=优化 / fix=修复）；
- * 3. 产品名在 SITE.productName 与 <title> 中修改。
+ *
+ * 数据来源：每个平台可配置 repo: "用户名/仓库名"，页面会自动读取该仓库
+ * 的 GitHub Releases（版本号、附件下载、更新日志正文），可以是自己的
+ * 仓库，也可以是其它人的公开仓库，例如：
+ *   repo: "luodaoyi/TAD6S4N10G-fnos"
+ *   prefer:  可选，主下载附件的匹配正则（命中的排第一位）
+ *   exclude: 可选，需要从下载列表排除的附件正则
+ * repo 留空（null）或拉取失败时，使用下方 latest / changelog 内置数据
+ * 兜底展示。拉取结果缓存 10 分钟，避免触发 GitHub 接口限流（每小时 60 次）。
  * ===================================================================== */
 const SITE = {
   productName: "云枢",
@@ -373,6 +393,9 @@ const PLATFORMS = [
     sub: "飞牛私有云 NAS",
     desc: "适用于飞牛私有云 fnOS 4.0 及以上版本 · x86_64 架构",
     icon: "drive",
+    repo: "luodaoyi/TAD6S4N10G-fnos",
+    prefer: "\\.fpk$",
+    exclude: "^tank-",
     tip: "打开 fnOS「应用中心 → 手动安装」，选择下载的 <code>.fpk</code> 安装包完成安装。",
     latest: {
       version: "2.4.0",
@@ -415,6 +438,7 @@ const PLATFORMS = [
     sub: "Synology DSM 7.x",
     desc: "适用于 DSM 7.0 – 7.2 · 提供 x86_64 与 ARM64 套件",
     icon: "server",
+    repo: null,
     tip: "推荐在「套件中心」搜索安装；手动安装请进入套件中心 → 手动安装，上传 <code>.spk</code> 文件。",
     latest: {
       version: "2.4.0",
@@ -457,6 +481,7 @@ const PLATFORMS = [
     sub: "Windows 10 / 11",
     desc: "适用于 Windows 10（1909）及以上 · 提供 x64 与 ARM64 安装包",
     icon: "windows",
+    repo: null,
     tip: "双击运行安装程序，按向导完成安装；便携版解压后直接运行 <code>CloudHub.exe</code> 即可。",
     latest: {
       version: "2.4.1",
@@ -503,6 +528,7 @@ const PLATFORMS = [
     sub: "Unraid 6.10+",
     desc: "适用于 Unraid 6.10 及以上版本 · 以插件方式安装",
     icon: "rack",
+    repo: null,
     tip: "在 Unraid「Apps / 插件」中搜索安装，或下载 <code>.plg</code> 后通过「Install Plugin」安装。",
     latest: {
       version: "2.3.2",
@@ -539,6 +565,7 @@ const PLATFORMS = [
     sub: "deb / rpm / AppImage",
     desc: "提供 deb、rpm 与 AppImage 三种格式 · 支持 x86_64 与 ARM64",
     icon: "terminal",
+    repo: null,
     tip: "deb 系：<code>sudo apt install ./cloudhub_amd64.deb</code>；rpm 系：<code>sudo dnf install ./cloudhub.x86_64.rpm</code>；AppImage：<code>chmod +x</code> 后直接运行。",
     latest: {
       version: "2.4.1",
@@ -597,7 +624,8 @@ const ICONS = {
   back: '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
   info: '<circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
   zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
-  arrow: '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>'
+  arrow: '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'
 };
 function icon(name){
   return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[name] || "") + "</svg>";
@@ -612,43 +640,217 @@ document.getElementById("brand-mark").innerHTML = icon("drive");
 document.getElementById("brand-name").textContent = SITE.productName;
 document.title = SITE.title;
 
+/* ===================== GitHub Releases 动态数据 ===================== */
+/* 每个平台的数据状态：内置数据先行渲染，GitHub 拉取成功后整体替换 */
+const GH_TTL = 10 * 60 * 1000;
+const state = {};
+function stOf(p){
+  if(!state[p.id]) state[p.id] = { latest: p.latest, changelog: p.changelog, changelogSrc: "static", loading: false, error: false };
+  return state[p.id];
+}
+PLATFORMS.forEach(stOf);
+
+function esc(s){
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function fmtDate(iso){
+  const d = new Date(iso);
+  if(isNaN(d)) return "";
+  const pad = function(n){ return String(n).padStart(2, "0"); };
+  return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+}
+function humanSize(bytes){
+  if(!Number.isFinite(bytes) || bytes <= 0) return "";
+  if(bytes >= 1073741824) return (bytes / 1073741824).toFixed(2) + " GB";
+  if(bytes >= 1048576) return (bytes / 1048576).toFixed(1) + " MB";
+  return Math.max(1, Math.round(bytes / 1024)) + " KB";
+}
+function tagVer(tag){ return String(tag || "").replace(/^v/i, ""); }
+
+/* localStorage 缓存：10 分钟内不重复请求；请求失败时允许用过期缓存兜底 */
+function cacheGet(key, allowStale){
+  try{
+    const v = JSON.parse(localStorage.getItem("ghrel:" + key));
+    if(!v) return null;
+    if(Date.now() - v.t < GH_TTL) return { fresh: true, data: v.d };
+    return allowStale ? { fresh: false, data: v.d } : null;
+  }catch(e){ return null; }
+}
+function cacheSet(key, data){
+  try{ localStorage.setItem("ghrel:" + key, JSON.stringify({ t: Date.now(), d: data })); }catch(e){}
+}
+async function ghApi(path, key){
+  const hit = cacheGet(key, true);
+  if(hit && hit.fresh) return hit.data;
+  try{
+    const res = await fetch("https://api.github.com" + path, {
+      headers: { "Accept": "application/vnd.github+json" },
+      signal: AbortSignal.timeout(8000)
+    });
+    if(!res.ok) throw new Error("GitHub API HTTP " + res.status);
+    const data = await res.json();
+    cacheSet(key, data);
+    return data;
+  }catch(e){
+    if(hit) return hit.data;
+    throw e;
+  }
+}
+
+/* 把仓库 Release 数据归一化为页面使用的结构；prefer 命中的附件排最前（作为主下载） */
+function normLatest(rel, p){
+  const excl = p.exclude ? new RegExp(p.exclude, "i") : null;
+  let assets = (rel.assets || [])
+    .filter(function(a){ return !/\.sha256$|\.sha2$|\.sig$|\.asc$/i.test(a.name); })
+    .filter(function(a){ return !(excl && excl.test(a.name)); })
+    .map(function(a){ return { label: a.name, file: a.name, arch: "", size: humanSize(a.size), url: a.browser_download_url }; });
+  const preferRe = p.prefer ? new RegExp(p.prefer, "i") : null;
+  if(preferRe){
+    assets.sort(function(a, b){ return (preferRe.test(b.file) ? 1 : 0) - (preferRe.test(a.file) ? 1 : 0); });
+  }
+  return { version: tagVer(rel.tag_name), date: fmtDate(rel.published_at), assets: assets };
+}
+function normRelease(r){
+  return { version: tagVer(r.tag_name), date: fmtDate(r.published_at), body: r.body || "", url: r.html_url || "" };
+}
+
+/* 轻量 Markdown 渲染（零依赖）：内容先整体转义再生成白名单标签，防 XSS */
+function mdInline(t){
+  const codes = [];
+  t = t.replace(/`([^`]+)`/g, function(_, c){ codes.push(c); return "\x00" + (codes.length - 1) + "\x00"; });
+  t = t.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  t = t.replace(/\x00(\d+)\x00/g, function(_, i){ return "<code>" + codes[+i] + "</code>"; });
+  return t;
+}
+function mdToHtml(src){
+  const lines = String(src || "").replace(/\r\n?/g, "\n").split("\n");
+  let html = "", para = [], list = null, ordered = false, code = null;
+  const flushP = function(){
+    if(para.length){ html += "<p>" + para.map(mdInline).join("<br>") + "</p>"; para = []; }
+  };
+  const flushL = function(){
+    if(list){
+      const tag = ordered ? "ol" : "ul";
+      html += "<" + tag + ">" + list.map(function(li){ return "<li>" + mdInline(li) + "</li>"; }).join("") + "</" + tag + ">";
+      list = null;
+    }
+  };
+  for(const raw of lines){
+    const line = raw.replace(/\s+$/, "");
+    if(code !== null){
+      if(/^```/.test(line)){ html += "<pre><code>" + esc(code.join("\n")) + "</code></pre>"; code = null; }
+      else code.push(raw);
+      continue;
+    }
+    if(/^```/.test(line)){ flushP(); flushL(); code = []; continue; }
+    const h = line.match(/^(#{1,6})\s+(.*)/);
+    if(h){ flushP(); flushL(); const tag = "h" + Math.min(h[1].length + 2, 6); html += "<" + tag + ">" + mdInline(esc(h[2])) + "</" + tag + ">"; continue; }
+    const ul = line.match(/^\s*[-*+]\s+(.*)/);
+    if(ul){ flushP(); if(list && ordered) flushL(); if(!list){ list = []; ordered = false; } list.push(esc(ul[1])); continue; }
+    const ol = line.match(/^\s*\d+[.、)]\s+(.*)/);
+    if(ol){ flushP(); if(list && !ordered) flushL(); if(!list){ list = []; ordered = true; } list.push(esc(ol[1])); continue; }
+    if(!line.trim()){ flushP(); flushL(); continue; }
+    flushL(); para.push(esc(line));
+  }
+  if(code !== null) html += "<pre><code>" + esc(code.join("\n")) + "</code></pre>";
+  flushP(); flushL();
+  return html;
+}
+
+/* 同步：latest 用于首页卡片；Releases 列表用于平台页更新日志（保留 body 原文渲染） */
+let current = { view: "home", id: null };
+function repaint(preserveScroll){
+  const y = window.scrollY;
+  if(current.view === "home"){
+    renderHome();
+  }else{
+    const p = PLATFORMS.find(function(x){ return x.id === current.id; });
+    if(p){
+      paintPlatform(p);
+      if(preserveScroll) window.scrollTo({ top: y, behavior: "auto" });
+    }
+  }
+}
+async function syncLatest(p){
+  try{
+    const rel = await ghApi("/repos/" + p.repo + "/releases/latest", "latest:" + p.repo);
+    if(rel && rel.tag_name){
+      const st = stOf(p);
+      st.latest = normLatest(rel, p);
+      st.error = false;
+    }
+    repaint(false);
+  }catch(e){
+    stOf(p).error = true;
+    if(current.view === "platform" && current.id === p.id) repaint(true);
+  }
+}
+async function syncReleases(p){
+  const st = stOf(p);
+  if(st.loading || st.changelogSrc === "github") return;
+  st.loading = true;
+  repaint(true);
+  try{
+    const list = await ghApi("/repos/" + p.repo + "/releases?per_page=20", "releases:" + p.repo);
+    if(Array.isArray(list) && list.length){
+      st.changelog = list.map(normRelease);
+      if(list[0].tag_name) st.latest = normLatest(list[0], p);
+      st.changelogSrc = "github";
+      st.error = false;
+    }
+  }catch(e){
+    st.error = true;
+  }
+  st.loading = false;
+  repaint(true);
+}
+
 /* 首页：平台卡片 */
 function renderHome(){
   document.getElementById("platform-grid").innerHTML = PLATFORMS.map(function(p){
-    const a = p.latest.assets[0];
-    return '<a class="platform-card" href="#/platform/' + p.id + '" aria-label="进入' + p.name + '下载页，最新版本 v' + p.latest.version + '">' +
+    const st = stOf(p);
+    const a = st.latest.assets[0];
+    return '<a class="platform-card" href="#/platform/' + p.id + '" aria-label="进入' + esc(p.name) + '下载页，最新版本 v' + esc(st.latest.version) + '">' +
         '<span class="p-arrow">' + icon("arrow") + "</span>" +
         '<span class="p-icon">' + icon(p.icon) + "</span>" +
-        "<span><h3>" + p.name + "</h3><span class='p-sub'>" + p.sub + "</span></span>" +
-        '<span class="p-meta"><span class="ver-chip">' + icon("download") + "v" + p.latest.version + "</span><span>" + a.size + "</span></span>" +
+        '<span class="p-text"><h3>' + esc(p.name) + "</h3><span class='p-sub'>" + esc(p.sub) + "</span></span>" +
+        '<span class="p-meta"><span class="ver-chip">' + icon("download") + "v" + esc(st.latest.version) + "</span><span>" + (a ? esc(a.size) : "") + "</span></span>" +
       "</a>";
   }).join("");
 
-  /* 顶部“最新发布”摘要：取全平台日期最新的一条 */
+  /* 顶部"最新发布"摘要：取全平台日期最新的一条 */
   let newest = PLATFORMS[0];
   PLATFORMS.forEach(function(p){
-    if (new Date(p.latest.date) > new Date(newest.latest.date)) newest = p;
+    if(new Date(stOf(p).latest.date) > new Date(stOf(newest).latest.date)) newest = p;
   });
   document.getElementById("hero-meta").innerHTML =
-    "最新发布 <b>v" + newest.latest.version + "</b> · " + newest.latest.date + " · 覆盖 " + PLATFORMS.length + " 个平台";
+    "最新发布 <b>v" + esc(stOf(newest).latest.version) + "</b> · " + esc(stOf(newest).latest.date) + " · 覆盖 " + PLATFORMS.length + " 个平台";
 }
 
-/* 更新日志条目 */
+/* 更新日志条目：GitHub 数据带 body（Markdown 正文），内置数据按分组渲染 */
 function releaseHTML(r, i){
-  const groups = [
-    ["new", "新增", r.new || []],
-    ["imp", "优化", r.imp || []],
-    ["fix", "修复", r.fix || []]
-  ].filter(function(g){ return g[2].length > 0; });
+  let detail;
+  if(r.body != null){
+    detail = '<div class="md">' + mdToHtml(r.body) + "</div>";
+  }else{
+    const groups = [
+      ["new", "新增", r.new || []],
+      ["imp", "优化", r.imp || []],
+      ["fix", "修复", r.fix || []]
+    ].filter(function(g){ return g[2].length > 0; });
+    detail = groups.map(function(g){
+      return '<div class="group"><span class="group-tag tag-' + g[0] + '">' + g[1] + "</span><ul>" +
+        g[2].map(function(t){ return "<li>" + t + "</li>"; }).join("") +
+        "</ul></div>";
+    }).join("");
+  }
   return '<div class="release ' + (i === 0 ? "latest" : "old") + '">' +
-      '<div class="rel-head"><span class="v">v' + r.version + "</span>" +
+      '<div class="rel-head"><span class="v">v' + esc(r.version) + "</span>" +
       (i === 0 ? '<span class="badge-latest">最新</span>' : "") +
-      '<span class="rel-date">' + r.date + "</span></div>" +
-      groups.map(function(g){
-        return '<div class="group"><span class="group-tag tag-' + g[0] + '">' + g[1] + "</span><ul>" +
-          g[2].map(function(t){ return "<li>" + t + "</li>"; }).join("") +
-          "</ul></div>";
-      }).join("") +
+      '<span class="rel-date">' + esc(r.date) + "</span>" +
+      (r.url ? '<a class="rel-link" href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer">GitHub ↗</a>' : "") +
+      "</div>" + detail +
     "</div>";
 }
 
@@ -657,29 +859,48 @@ function dlAttrs(url){
   return 'href="' + url + '"' + (url === "#" ? ' data-stub' : "");
 }
 
-/* 平台下载页 */
-function renderPlatform(p){
-  const l = p.latest;
+/* 平台下载页（paintPlatform 只负责渲染，视图切换见 showPlatform） */
+function paintPlatform(p){
+  const st = stOf(p);
+  const l = st.latest;
   const main = l.assets[0];
   const rest = l.assets.slice(1);
+  const fileLine = main ? [main.file, main.arch, main.size].filter(Boolean).join(" · ") : "";
+
+  let srcNote = "";
+  if(p.repo){
+    const repoLink = '<a href="https://github.com/' + esc(p.repo) + '" target="_blank" rel="noopener noreferrer">' + esc(p.repo) + "</a>";
+    if(st.changelogSrc === "github"){
+      srcNote = '<div class="src-note">' + icon("link") + "数据来源：" + repoLink + " · 已同步 GitHub Releases</div>";
+    }else if(st.loading){
+      srcNote = '<div class="src-note">' + icon("link") + "数据来源：" + repoLink + " · 正在获取更新日志…</div>";
+    }else if(st.error){
+      srcNote = '<div class="src-note">' + icon("info") + "GitHub 数据获取失败，当前展示内置数据</div>";
+    }
+  }
+  const chSub = st.changelogSrc === "github"
+    ? "数据来自 GitHub Releases，新版本在上"
+    : "以下为" + esc(p.name) + "的历史版本记录，新版本在上";
+
   document.getElementById("view-platform").innerHTML =
     '<div class="container">' +
       '<a class="back" href="#/">' + icon("back") + "返回选择平台</a>" +
       '<div class="plat-head">' +
         '<span class="p-icon big">' + icon(p.icon) + "</span>" +
-        "<div><h1 class='plat-title' tabindex='-1'>" + p.name + "</h1>" +
-        '<p class="plat-desc">' + p.desc + "</p></div>" +
+        "<div><h1 class='plat-title' tabindex='-1'>" + esc(p.name) + "</h1>" +
+        '<p class="plat-desc">' + esc(p.desc) + "</p></div>" +
       "</div>" +
       '<div class="download-card">' +
-        '<div class="rel-meta"><span class="ver-big">v' + l.version + '</span><span class="badge-latest">最新版本</span><span class="rel-date">' + l.date + " 发布</span></div>" +
+        '<div class="rel-meta"><span class="ver-big">v' + esc(l.version) + '</span><span class="badge-latest">最新版本</span><span class="rel-date">' + esc(l.date) + " 发布</span></div>" +
         '<div class="actions">' +
-          "<a class='btn btn-primary' " + dlAttrs(main.url) + ">" + icon("download") + "下载 " + main.label + "</a>" +
+          "<a class='btn btn-primary' " + dlAttrs(main ? main.url : "#") + ">" + icon("download") + "下载 " + esc(main ? main.label : "安装包") + "</a>" +
           '<button class="btn btn-secondary" type="button" data-goto-log>' + icon("history") + "查看更新日志</button>" +
         "</div>" +
-        '<div class="file-line">' + main.file + " · " + main.arch + " · " + main.size + "</div>" +
+        (fileLine ? '<div class="file-line">' + esc(fileLine) + "</div>" : "") +
         (rest.length > 0
           ? '<div class="assets"><h4>其他格式 / 架构</h4>' + rest.map(function(a){
-              return '<div class="asset-row"><div><div class="a-name">' + a.file + '</div><div class="a-meta">' + a.label + " · " + a.arch + " · " + a.size + "</div></div>" +
+              const meta = [a.label !== a.file ? a.label : "", a.arch, a.size].filter(Boolean).join(" · ");
+              return '<div class="asset-row"><div><div class="a-name">' + esc(a.file) + '</div><div class="a-meta">' + esc(meta) + "</div></div>" +
                 "<a class='btn btn-sm btn-secondary' " + dlAttrs(a.url) + ">" + icon("download") + "下载</a></div>";
             }).join("") + "</div>"
           : "") +
@@ -687,8 +908,9 @@ function renderPlatform(p){
       "</div>" +
       '<div class="changelog" id="changelog-section">' +
         "<h2>更新日志</h2>" +
-        '<p class="ch-sub">以下为' + p.name + "的历史版本记录，新版本在上</p>" +
-        '<div class="timeline">' + p.changelog.map(releaseHTML).join("") + "</div>" +
+        '<p class="ch-sub">' + chSub + "</p>" +
+        srcNote +
+        '<div class="timeline">' + st.changelog.map(releaseHTML).join("") + "</div>" +
       "</div>" +
     "</div>";
 }
@@ -696,32 +918,34 @@ function renderPlatform(p){
 /* 视图切换 */
 const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function showHome(){
+  current = { view: "home", id: null };
   document.getElementById("view-platform").hidden = true;
   document.getElementById("view-home").hidden = false;
   document.title = SITE.title;
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 function showPlatform(p){
-  renderPlatform(p);
+  current = { view: "platform", id: p.id };
+  paintPlatform(p);
   document.getElementById("view-home").hidden = true;
-  const view = document.getElementById("view-platform");
-  view.hidden = false;
+  document.getElementById("view-platform").hidden = false;
   document.title = p.name + "下载 · " + SITE.productName;
   window.scrollTo({ top: 0, behavior: "auto" });
+  if(p.repo) syncReleases(p);
 }
 
 /* 路由：#/ 为首页，#/platform/<id> 为对应平台下载页 */
 function route(){
   const m = location.hash.match(/^#\/platform\/([\w-]+)/);
   const p = m && PLATFORMS.find(function(x){ return x.id === m[1]; });
-  if (p) showPlatform(p); else showHome();
+  if(p) showPlatform(p); else showHome();
 }
 window.addEventListener("hashchange", route);
 
-/* 全局点击：占位链接（href="#"）不跳转；“查看更新日志”平滑滚动并高亮 */
+/* 全局点击：占位链接（href="#"）不跳转；"查看更新日志"平滑滚动并高亮 */
 document.addEventListener("click", function(e){
   const logBtn = e.target.closest("[data-goto-log]");
-  if (logBtn){
+  if(logBtn){
     const section = document.getElementById("changelog-section");
     section.scrollIntoView({ behavior: prefersReduced ? "auto" : "smooth", block: "start" });
     section.classList.remove("flash");
@@ -730,11 +954,13 @@ document.addEventListener("click", function(e){
     return;
   }
   const a = e.target.closest("a");
-  if (a && a.getAttribute("href") === "#") e.preventDefault();
+  if(a && a.getAttribute("href") === "#") e.preventDefault();
 });
 
+/* 启动：先用内置数据渲染，再异步同步各平台的 GitHub Releases */
 renderHome();
 route();
+PLATFORMS.forEach(function(p){ if(p.repo) syncLatest(p); });
 </script>
 </body>
 </html>
