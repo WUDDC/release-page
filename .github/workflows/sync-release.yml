@@ -21,22 +21,32 @@ jobs:
       - name: 下载上游最新 release 的 fpk/spk 并加版本号
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # 格式：每行一个「上游仓库 目标目录」
+          # 格式：每行一个「上游仓库 目标目录 清单文件名」（清单名可省略，默认 manifest.json）
           SOURCES: |
-            luodaoyi/TAD6S4N10G-fnos app
+            luodaoyi/TAD6S4N10G-fnos app fnos.json
         run: |
-          while read -r repo dir; do
+          while read -r repo dir mname; do
             [ -z "$repo" ] && continue
-            tag=$(gh api "repos/$repo/releases/latest" --jq .tag_name)
-            echo ">> $repo 最新版本 $tag -> $dir/"
+            mname=${mname:-manifest.json}
+            read -r tag pub <<< "$(gh api "repos/$repo/releases/latest" --jq '.tag_name + " " + .published_at')"
+            echo ">> $repo 最新版本 $tag -> $dir/ ($mname)"
             mkdir -p "$dir"
             gh release download "$tag" --repo "$repo" --dir "$dir" --clobber \
               --pattern '*.fpk' --pattern '*.spk'
-            # 重命名：tad-module.fpk -> tad-module-v1.0.1.fpk
+            # 重命名：tad-module.fpk -> tad-module-v1.0.1.fpk，并收集文件名/大小
+            names=(); sizes="{"
             for f in "$dir"/*.fpk "$dir"/*.spk; do
               [ -e "$f" ] || continue
               mv "$f" "${f%.*}-$tag.${f##*.}"
+              f="${f%.*}-$tag.${f##*.}"
+              b=$(basename "$f"); names+=("$b"); sizes+="\"$b\":$(stat -c%s "$f"),"
             done
+            sizes="${sizes%,}}"
+            # 版本清单：发布页读它来生成本地下载链接，无需访问 GitHub API
+            jq -n --arg repo "$repo" --arg tag "$tag" --arg pub "$pub" --argjson sizes "$sizes" \
+              '{repo:$repo, tag:$tag, published:$pub, generated:(now|todate), files:$ARGS.positional, sizes:$sizes}' \
+              --args "${names[@]}" > "$dir/$mname"
+            echo "   $mname: $(cat "$dir/$mname")"
           done <<< "$SOURCES"
 
       - name: 有变化才提交推送
