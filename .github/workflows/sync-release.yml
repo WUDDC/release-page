@@ -32,22 +32,27 @@ jobs:
             echo ">> $repo 最新版本 $tag -> $dir/ ($mname)"
             # 下载到临时目录再改名拷入，避免误改 app/ 里已有的历史版本文件
             tmp=$(mktemp -d)
+            : > "$tmp/files.tsv"
             gh release download "$tag" --repo "$repo" --dir "$tmp" --clobber \
               --pattern '*.fpk' --pattern '*.spk'
             mkdir -p "$dir"
-            names=(); sizes="{"
+            names=""
             for f in "$tmp"/*.fpk "$tmp"/*.spk; do
               [ -e "$f" ] || continue
               b="$(basename "${f%.*}")-$tag.${f##*.}"
               mv "$f" "$dir/$b"
-              names+=("$b"); sizes+="\"$b\":$(stat -c%s "$dir/$b"),"
+              printf '%s\t%s\n' "$b" "$(stat -c%s "$dir/$b")" >> "$tmp/files.tsv"
+              names+="$b
+"
             done
-            rm -rf "$tmp"
-            sizes="${sizes%,}"
             # 版本清单：发布页读它来生成本地下载链接，无需访问 GitHub API
-            jq -n --arg repo "$repo" --arg tag "$tag" --arg pub "$pub" --argjson sizes "$sizes" \
-              '{repo:$repo, tag:$tag, published:$pub, generated:(now|todate), files:$ARGS.positional, sizes:$sizes}' \
-              --args "${names[@]}" > "$dir/$mname"
+            jq -R -s --arg repo "$repo" --arg tag "$tag" --arg pub "$pub" '
+              (split("\n") | map(select(length>0)) | map(split("\t"))
+                | map({key:.[0], value:(.[1]|tonumber)}) | from_entries) as $s
+              | {repo:$repo, tag:$tag, published:$pub, generated:(now|todate),
+                 files:($s|keys_unsorted), sizes:$s}
+            ' < "$tmp/files.tsv" > "$dir/$mname"
+            rm -rf "$tmp"
             echo "   $mname: $(cat "$dir/$mname")"
           done <<< "$SOURCES"
 
