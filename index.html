@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="TAD6S4N模块全平台发布页：支持 fnOS、群晖、Windows、Unraid 与 Linux，下载最新版本并查看更新日志。">
+<link rel="icon" type="image/png" href="assets/logo.png">
 <title>TAD6S4N模块 · 软件发布页</title>
 <style>
 /* ========== 主题变量（浅色 / 深色自适应） ========== */
@@ -85,12 +86,7 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
 }
 .header-inner{display:flex;align-items:center;gap:12px;height:62px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:17px;letter-spacing:-.2px}
-.brand-mark{
-  width:32px;height:32px;border-radius:9px;flex:none;
-  background:linear-gradient(135deg,var(--brand),var(--brand-2));
-  display:grid;place-items:center;color:#fff;
-}
-.brand-mark .icon{width:18px;height:18px}
+.brand-logo{width:32px;height:32px;border-radius:9px;flex:none;display:block}
 .header-nav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
 .header-nav a{padding:7px 12px;border-radius:8px;color:var(--text-2);font-size:14px;transition:.15s}
 .header-nav a:hover{color:var(--text);background:var(--surface-2)}
@@ -320,7 +316,7 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
 <header class="site-header">
   <div class="container header-inner">
     <a class="brand" href="#/">
-      <span class="brand-mark" id="brand-mark"></span>
+      <img class="brand-logo" src="assets/logo.png" alt="TAD6S4N模块 logo" width="32" height="32">
       <span id="brand-name">TAD6S4N模块</span>
     </a>
     <nav class="header-nav" aria-label="站点导航">
@@ -619,7 +615,6 @@ document.querySelectorAll("[data-icon]").forEach(el => {
 });
 
 /* 品牌与文案 */
-document.getElementById("brand-mark").innerHTML = icon("drive");
 document.getElementById("brand-name").textContent = SITE.productName;
 document.title = SITE.title;
 
