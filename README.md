@@ -2,6 +2,14 @@
 
 单文件静态页面，无需构建、无外部依赖，直接部署即可（Nginx / 对象存储 / GitHub Pages 等任意静态托管）。
 
+## 自动部署
+
+已配置 GitHub Actions（`.github/workflows/deploy.yml`）：每次推送到 `main` 分支会自动构建并发布到 GitHub Pages，访问地址：
+
+https://wuddc.github.io/release-page/
+
+也可在仓库 Actions 页面手动触发（workflow_dispatch）。
+
 ## 页面结构
 
 - **首页** `#/`：一排平台按钮（fnOS / 群晖 / Windows / Unraid / Linux），显示各系统最新版本号，点击进入对应系统下载页。
