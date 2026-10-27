@@ -38,7 +38,7 @@ https://wuddc.github.io/release-page/
 
 ## 页面结构
 
-- **首页** `#/`：一排平台按钮（fnOS / 群晖 / Windows / Unraid / Linux），显示各系统最新版本号，点击进入对应系统下载页。
+- **首页** `#/`：产品介绍（口号、主要功能、界面一览，内容迁自旧 ftp-backup 官网页），下方为一排平台按钮（fnOS / 群晖 / Windows / Unraid / Linux），显示各系统最新版本号，点击进入对应系统下载页。
 - **平台下载页** `#/platform/fnos`、`#/platform/synology`、`#/platform/windows`、`#/platform/unraid`、`#/platform/linux`：
   - 最新版下载按钮 + 文件名 / 架构 / 体积，多架构、多格式会列在「其他格式 / 架构」；
   - 「查看更新日志」按钮（点击滚动到日志区域并高亮）；
