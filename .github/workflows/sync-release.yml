@@ -1,0 +1,54 @@
+name: Sync upstream release
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'   # 每 6 小时检查一次
+  workflow_dispatch:          # 手动触发按钮，方便测试
+
+concurrency:
+  group: sync-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 下载上游最新 release 的 fpk/spk 并加版本号
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 格式：每行一个「上游仓库 目标目录」
+          SOURCES: |
+            luodaoyi/TAD6S4N10G-fnos app
+        run: |
+          while read -r repo dir; do
+            [ -z "$repo" ] && continue
+            tag=$(gh api "repos/$repo/releases/latest" --jq .tag_name)
+            echo ">> $repo 最新版本 $tag -> $dir/"
+            mkdir -p "$dir"
+            gh release download "$tag" --repo "$repo" --dir "$dir" --clobber \
+              --pattern '*.fpk' --pattern '*.spk'
+            # 重命名：tad-module.fpk -> tad-module-v1.0.1.fpk
+            for f in "$dir"/*.fpk "$dir"/*.spk; do
+              [ -e "$f" ] || continue
+              mv "$f" "${f%.*}-$tag.${f##*.}"
+            done
+          done <<< "$SOURCES"
+
+      - name: 有变化才提交推送
+        env:
+          SYNC_PAT: ${{ secrets.SYNC_PAT }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A app
+          if git diff --cached --quiet; then
+            echo "上游无更新，跳过"
+            exit 0
+          fi
+          git commit -m "chore: sync latest release artifacts"
+          git push "https://x-access-token:${SYNC_PAT}@github.com/WUDDC/release-page.git" main
