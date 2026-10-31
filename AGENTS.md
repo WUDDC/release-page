@@ -8,10 +8,11 @@
 
 1. **禁止通过 FTP / 宝塔面板 / SCP 向源站 `tad.mi-d.cn`（156.233.226.16）上传任何站点文件。**
    源站不是部署目标，上面没有、也不应该有网站内容。
-2. **唯一部署方式：向本仓库 `main` 分支 push。** 推送后自动完成三端发布，无需任何手工步骤：
+2. **唯一部署方式：向本仓库 `main` 分支 push。** 推送后自动完成多端发布，无需任何手工步骤：
    - GitHub Pages → https://wuddc.github.io/release-page/ （`.github/workflows/deploy.yml`）
-   - EdgeOne Pages → https://test-curamwebsite.edgeone.app/ （EdgeOne 项目 git 集成 main，自动构建）
-   - CNB 镜像 → https://cnb.cool/konno/release-page （`.github/workflows/sync-cnb.yml`）
+   - Cloudflare Pages → https://release-page-8wm.pages.dev/ （项目 git 集成 main，自动构建；**国内可达，是当前主发布源**）
+   - EdgeOne Pages → https://test-curamwebsite.edgeone.app/ （EdgeOne 项目 git 集成 main，自动构建；**仅作备用，国内大陆无法访问其默认域名**）
+   - CNB 镜像 → https://cnb.cool/konno/release-page （`.github/workflows/sync-cnb.yml`；CNB 无自建静态托管，仅作仓库镜像）
 3. **不要在源站上"顺手修内容"。** 线上内容有问题 → 改仓库 → push。
    源站仅剩的几个壳文件归站点所有者维护；确需紧急修改壳本身，先向所有者要 FTP 凭据，
    改动前备份原文件，改完向所有者说明改了什么、为什么。
@@ -32,35 +33,25 @@
 ## 源站现状（tad.mi-d.cn —— 仅当访问壳用）
 
 站点所有者**暂时无法修改 DNS**，源站目前靠 4 个 iframe 壳文件维持域名可访问
-（地址栏保持 tad.mi-d.cn，iframe 按 EdgeOne 同路径加载内容，10 秒超时显示直达链接浮层）：
+（地址栏保持 tad.mi-d.cn，iframe 按发布源同路径加载内容，10 秒超时显示直达链接浮层）：
 
-- `/index.html`、`/404.html`：→ EdgeOne + 原路径；根 `/404.html` 为智能版，
-  对 `/release-page` 前缀路径映射到 EdgeOne `/release/`（兼容旧深链）
-- `/release-page/index.html`、`/release-page/404.html`：→ EdgeOne `/release/` + 余路径
+- **发布源（2026-10-31 起）：https://release-page-8wm.pages.dev/（Cloudflare Pages）**，
+  原 EdgeOne 域名因中国大陆无法访问而退役为浮层里的备用直达链接
+- `/index.html`、`/404.html`：→ 发布源 + 原路径；根 `/404.html` 为智能版，
+  对 `/release-page` 前缀路径映射到 `/release/`（兼容旧深链）
+- `/release-page/index.html`、`/release-page/404.html`：→ `/release/` + 余路径
 - nginx `error_page 404` 指向根 `/404.html`，所有不存在的路径都由壳兜底
 - HTTPS 证书由面板自动续期（当前有效期至 2027-01-18）
 
 壳文件**只存在于源站上，不在本仓库里**——不要把它们"补"进仓库，也不要在仓库里引用它们。
 
-## ⚠️ 待办：DNS 切换（必须由站点所有者操作，AI 只能提醒）
+## ~~待办：DNS 切换~~（已作废，2026-10-31）
 
-EdgeOne 控制台对 `tad.mi-d.cn` 提示 **「请添加 CNAME」**，目标：
-`tad.mi-d.cn.pages.dnsoe7.com`。
-请到 `mi-d.cn` 的 DNS 解析服务商（hichina / 阿里云云解析）操作：
-
-| 项目 | 值 |
-|---|---|
-| 主机记录 | `tad` |
-| 记录类型 | CNAME |
-| 记录值 | `tad.mi-d.cn.pages.dnsoe7.com` |
-| TTL | 默认（600）即可 |
-
-**注意：先删除 `tad` 现有的一条 A 记录（指向 156.233.226.16），再添加 CNAME**——
-同一主机名下 A 与 CNAME 不能共存，不删旧记录会导致解析冲突、切换不生效。
-
-生效后：tad.mi-d.cn 由 EdgeOne 直接服务（自动 HTTPS），访问不再经过源站壳。
-收尾工作（生效确认后执行）：源站壳文件删除、服务器可下线；本文件"源站现状"一节随之作废，
-请同步更新。
+原计划把 `tad.mi-d.cn` CNAME 切到 EdgeOne（`tad.mi-d.cn.pages.dnsoe7.com`）。
+**该计划已取消**：EdgeOne Pages 默认域名中国大陆无法访问，即使切了 DNS 国内用户也进不来。
+现状即是稳定架构： tad.mi-d.cn 源站壳 → Cloudflare Pages（国内可达）。
+若日后 DNS 可控，更优方案是直接把 tad.mi-d.cn 解析到 Cloudflare Pages 的自定义域
+（在 Cloudflare Pages 项目里绑定自定义域后按其提示加 CNAME），届时源站壳可退役。
 
 ---
 
