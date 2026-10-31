@@ -18,29 +18,39 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 下载上游最新 release 的 fpk/spk 并加版本号
+      - name: 下载上游最新 release 产物并加版本号
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # 格式：每行一个「上游仓库 目标目录 清单文件名」（清单名可省略，默认 manifest.json）
+          # 格式：每行一个「上游仓库 目标目录 清单文件名 匹配模式」
+          # （清单名默认 manifest.json；模式默认 "*.fpk *.spk"，多个用空格分隔）
           SOURCES: |
-            luodaoyi/TAD6S4N10G-fnos app fnos.json
+            luodaoyi/TAD6S4N10G-fnos app fnos.json *.fpk
+            luodaoyi/TAD6S4N10G-fnos app synology.json *.spk
         run: |
-          while read -r repo dir mname; do
+          while read -r repo dir mname patterns; do
             [ -z "$repo" ] && continue
             mname=${mname:-manifest.json}
+            [ -n "$patterns" ] || patterns='*.fpk *.spk'
             read -r tag pub <<< "$(gh api "repos/$repo/releases/latest" --jq '.tag_name + " " + .published_at')"
-            echo ">> $repo 最新版本 $tag -> $dir/ ($mname)"
+            echo ">> $repo 最新版本 $tag -> $dir/ ($mname: $patterns)"
             # 下载到临时目录再改名拷入，避免误改 app/ 里已有的历史版本文件
             tmp=$(mktemp -d)
             : > "$tmp/files.tsv"
-            gh release download "$tag" --repo "$repo" --dir "$tmp" --clobber \
-              --pattern '*.fpk' --pattern '*.spk'
+            pats=()
+            for g in $patterns; do pats+=(--pattern "$g"); done
+            gh release download "$tag" --repo "$repo" --dir "$tmp" --clobber "${pats[@]}"
             mkdir -p "$dir"
-            for f in "$tmp"/*.fpk "$tmp"/*.spk; do
-              [ -e "$f" ] || continue
-              b="$(basename "${f%.*}")-$tag.${f##*.}"
-              mv "$f" "$dir/$b"
-              printf '%s\t%s\n' "$b" "$(stat -c%s "$dir/$b")" >> "$tmp/files.tsv"
+            for g in $patterns; do
+              for f in "$tmp"/$g; do
+                [ -e "$f" ] || continue
+                b="$(basename "$f")"
+                case "$b" in
+                  *"$tag"*) ;;  # 文件名已含版本号（如 tad-module-v1.0.2.spk），保持原名
+                  *) b="$(basename "${f%.*}")-$tag.${f##*.}" ;;
+                esac
+                mv "$f" "$dir/$b"
+                printf '%s\t%s\n' "$b" "$(stat -c%s "$dir/$b")" >> "$tmp/files.tsv"
+              done
             done
             # 版本清单：发布页读它来生成本地下载链接，无需访问 GitHub API
             jq -R -s --arg repo "$repo" --arg tag "$tag" --arg pub "$pub" '

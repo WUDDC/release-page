@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="TAD6S4N模块发布页：fnOS 版已发布，群晖、Windows、Unraid 与 Linux 版即将上线，下载最新版本并查看更新日志。">
+<meta name="description" content="TAD6S4N模块发布页：fnOS 与群晖 DSM 版已发布，Windows、Unraid 与 Linux 版即将上线，下载最新版本并查看更新日志。">
 <link rel="icon" type="image/png" href="assets/logo.png">
 <title>TAD6S4N模块 · 软件发布页</title>
 <style>
@@ -360,7 +360,7 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
   <section id="view-home" class="view" aria-label="选择平台">
     <div class="container">
       <div class="hero">
-        <span class="eyebrow"><i data-icon="zap" aria-hidden="true"></i><span id="eyebrow-text">免费使用 · fnOS 已上线 · 群晖 / Windows / Unraid / Linux 即将上线</span></span>
+        <span class="eyebrow"><i data-icon="zap" aria-hidden="true"></i><span id="eyebrow-text">免费使用 · fnOS / 群晖 已上线 · Windows / Unraid / Linux 即将上线</span></span>
         <h1 id="hero-title">针对 TAD6S4N 主机硬件<br>深度适配的硬件管理模块</h1>
         <p class="lead" id="hero-lead">监控面板、风扇控制、按键映射、功耗设置、开关计划、电源监控、固件升级、压力测试——一个页面全管完，手机 APP 同样适配。</p>
         <p class="hero-meta" id="hero-meta"></p>
@@ -368,7 +368,7 @@ code{background:var(--surface-2);border-radius:6px;padding:1.5px 7px;font-size:1
       <div class="pick">
         <div class="section-head">
           <h2>选择你的平台</h2>
-          <span class="sub">fnOS 可直接下载 · 其余平台适配中，敬请期待</span>
+          <span class="sub">fnOS / 群晖 可直接下载 · 其余平台适配中，敬请期待</span>
         </div>
         <div class="platform-grid" id="platform-grid"><!-- JS 渲染 --></div>
         <p class="install-note">升级提示：直接安装新包即可覆盖升级，配置与历史数据自动保留；下载后建议核对 SHA256 校验值。</p>
@@ -480,13 +480,22 @@ const PLATFORMS = [
     id: "synology",
     name: "群晖版本",
     sub: "Synology DSM 7.x",
-    desc: "适用于 DSM 7.0 – 7.2 · 提供 x86_64 与 ARM64 套件",
+    desc: "适用于 DSM 7.0 – 7.2 · x86_64 架构",
     iconUrl: "https://fileres.synology.com/images/common/favicon/syno/icon-96x96.png",
     iconLocal: "assets/icons/synology.png",
-    repo: null,
-    comingSoon: true,
-    tip: "推荐在「套件中心」搜索安装；手动安装请进入套件中心 → 手动安装，上传 <code>.spk</code> 文件。",
-    latest: null,
+    repo: "luodaoyi/TAD6S4N10G-fnos",
+    prefer: "\\.spk$",
+    exclude: "^tank-",
+    localManifest: "../app/synology.json",
+    primaryLabel: "群晖套件",
+    tip: "进入套件中心 → 手动安装，上传下载的 <code>.spk</code> 文件完成安装。",
+    latest: {
+      version: "1.0.2",
+      date: "2026-10-30",
+      assets: [
+        { label: "群晖套件", file: "tad-module-v1.0.2.spk", arch: "x86_64", size: "5.6 MB", url: "https://github.com/luodaoyi/TAD6S4N10G-fnos/releases/download/v1.0.2/tad-module-v1.0.2.spk" }
+      ]
+    },
     changelog: []
   },
   {
