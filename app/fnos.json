@@ -2,13 +2,11 @@
   "repo": "luodaoyi/TAD6S4N10G-fnos",
   "tag": "v1.0.2",
   "published": "2026-10-30T18:08:09Z",
-  "generated": "2026-10-30T22:24:18Z",
+  "generated": "2026-10-31T01:19:14Z",
   "files": [
-    "tad-module-v1.0.2.fpk",
-    "tad-module-v1.0.2-v1.0.2.spk"
+    "tad-module-v1.0.2.fpk"
   ],
   "sizes": {
-    "tad-module-v1.0.2.fpk": 6028630,
-    "tad-module-v1.0.2-v1.0.2.spk": 5908480
+    "tad-module-v1.0.2.fpk": 6028630
   }
 }
