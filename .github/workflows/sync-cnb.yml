@@ -20,4 +20,4 @@ jobs:
           CNB_TOKEN: ${{ secrets.CNB_TOKEN }}
         run: |
           git remote add cnb "https://cnb:${CNB_TOKEN}@cnb.cool/konno/release-page.git"
-          git push cnb main --tags
+          git push --force cnb main --tags
